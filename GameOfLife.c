@@ -2,7 +2,7 @@
 #include<stdbool.h>
 #include<stdlib.h>
 #include<string.h>
-#include <conio.h>
+#include<conio.h>
 #include<time.h>
 #include<windows.h>
 #define BUFFSIZE 256
@@ -14,16 +14,12 @@ const char FILE_DIRECTORY[] = "C:\\networks\\GameOfLife"; //Location of the game
 static int sizeOfBoard;
 
 char* getFileDirectory(){
-    int lengthOfDirectory = strlen(FILE_DIRECTORY);
-    char fileDirectory[lengthOfDirectory];
-    for (int i = 0; i < lengthOfDirectory; i++)
-    {
-        fileDirectory[i] = FILE_DIRECTORY[i];
-    }
-    strcat(fileDirectory, "\\GameBoard.txt\0");
-    char *file = fileDirectory;
-    printf("%s", file);
-    return file;
+    char boardFile[] = "\\GameBoard.txt";
+    int lengthOfDirectory = strlen(FILE_DIRECTORY) + strlen(boardFile) - 1;
+    char *fileDirectory = malloc(sizeof(char)*lengthOfDirectory);
+    strcat(fileDirectory, FILE_DIRECTORY);
+    strcat(fileDirectory, boardFile);
+    return fileDirectory;
 }
 
 void getSizeOfBoard(){
@@ -117,15 +113,13 @@ void createRandomBoard(bool board[sizeOfBoard][sizeOfBoard]){
 
 void createFile(){
     char *fileDirectory = getFileDirectory();
-    char file[sizeof(fileDirectory)/8];
-    int index = 0;
-    do
+    while (*fileDirectory != FILE_DIRECTORY[0])
     {
-        file[index] = *fileDirectory;
         fileDirectory++;
-        index++;
-    } while (*fileDirectory != '\0');
-    FILE *gameBoard = fopen(file, "w+");
+    }
+    printf("%s", fileDirectory);
+    FILE *gameBoard;
+    gameBoard = fopen(fileDirectory, "w");
     for (int i = 0; i < sizeOfBoard; i++)
     {
         for (int j = 0; j < sizeOfBoard; j++)
@@ -138,8 +132,14 @@ void createFile(){
 }
 
 int setBoardTOFile(bool board[sizeOfBoard][sizeOfBoard]){
-    FILE *gameBoard = fopen(getFileDirectory(), "r");
-
+    char *file = getFileDirectory();
+    char fileDirectory[sizeof(file)];
+    for (int i = 0; i < strlen(fileDirectory); i++)
+    {
+        fileDirectory[i] = *file;
+        file++;
+    }
+    FILE *gameBoard = fopen(FILE_DIRECTORY, "r");
     if (gameBoard == NULL)
     {
         printf("Invalid input... Generating random board\n");
@@ -189,7 +189,7 @@ void createGameBoard(bool board[sizeOfBoard][sizeOfBoard])
         if (strncmp(makingBoard, "yes", 3) == 0) 
         {
             createFile();
-            printf("Go to the file \"GameBoard.txt\" in the directory: %s and replace the dead cells(-) that you want to change to living cells(+), press any key when you are done.\n", getFileDirectory());
+            printf("Go to the file \"GameBoard.txt\" in the directory: %s and replace the dead cells(-) that you want to change to living cells(+), press any key when you are done.\n", FILE_DIRECTORY);
             getch(); 
             setBoardTOFile(board);
             break;
@@ -319,45 +319,22 @@ void main(){
 //black square - 2B1B
 
 
-/*    int temp_x, temp_y;
-    int livingCellsAround;
-    for (int i = -1; i <= 1; i++)
+/*    
+    char boardFile[] = "\\GameBoard.txt";
+    for (int i = 0; i < sizeof(boardFile); i++)
     {
-        temp_x = x_coordinate + i;
-        
-        if(temp_x < 0 || temp_x >= sizeOfBoard)
-        {
-            continue;
-        }
-
-        for (int j = -1; j <= 1; j++)
-        {
-            temp_y = y_coordinate + j;
-            
-            if(temp_y < 0 || temp_y >= sizeOfBoard)
-            {
-                continue;
-            }
-
-            if (!board[temp_x][temp_y] && !helpBoard[temp_x][temp_y])
-            {
-                livingCellsAround = amountOflivingCellsAround(board, temp_x, temp_y);
-                helpBoard[temp_x][temp_y] = livingCellsAround == 3;
-            }
-        }
+        fileDirectory += boardFile[i];
+        fileDirectory++;
     }
-    
-    
-            for (int i = 0; i < sizeOfBoard; i++)
-        {
-            for (int j = 0; j < sizeOfBoard; j++)
-            {
-                livingCellsAround = amountOflivingCellsAround(board, i, j);
-
-                if (livingCellsAround == 2 || livingCellsAround == 3)
-                {
-                    helpBoard[i][j] = true;
-                }
-            }
-        }
     */
+
+/*
+    printf("%s", file);
+    int lengthOfDirectory = strlen(FILE_DIRECTORY) + strlen("\\GameBoard.txt");
+    char fileDirectory[lengthOfDirectory];
+    for (int i = 0; i < lengthOfDirectory; i++)
+    {
+        fileDirectory[i] = *file;
+        file++;
+    }
+    printf("%s", fileDirectory);*/
